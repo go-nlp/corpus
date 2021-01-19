@@ -1,7 +1,6 @@
 package corpus
 
 import (
-	"log"
 	"sort"
 	"sync/atomic"
 	"unicode/utf8"
@@ -111,7 +110,6 @@ func FromDict(d map[string]int) ConsOpt {
 			c.totalFreq++
 			runeCount := utf8.RuneCountInString(w)
 			if runeCount > c.maxWordLength {
-				log.Printf("FD MaxWordLength %d - %q", runeCount, w)
 				c.maxWordLength = runeCount
 			}
 		}

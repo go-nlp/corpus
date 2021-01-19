@@ -66,3 +66,51 @@ func TestCorpus_Merge(t *testing.T) {
 	assert.Equal(8, dict.WordFreq("hello"))
 	assert.Equal(2, dict.WordFreq("world"))
 }
+
+func TestCorpus_Replace(t *testing.T) {
+	dict := New()
+	dict.Add("Hello")
+	if err := dict.Replace("Hello", "Bye"); err != nil {
+		t.Fatal("Replacement caused an error")
+	}
+
+	helloID, ok := dict.Id("Hello")
+	assert.True(t, ok, "Hello should have an ID")
+	byeID, ok := dict.Id("Bye")
+	assert.True(t, ok, "Bye should have an ID")
+	assert.Equal(t, helloID, byeID)
+
+	// do it a second time and you will get an errorr
+	if err := dict.Replace("Hello", "Bye"); err == nil {
+		t.Errorf("Expected an error when replacing a word with a known ID")
+	}
+
+	if err := dict.Replace("Foo", "bar"); err == nil {
+		t.Errorf("Expected an error when replacing an unknown word")
+	}
+
+}
+
+func TestCorpus_ReplaceWord(t *testing.T) {
+	dict := New()
+	helloID := dict.Add("Hello")
+	if err := dict.ReplaceWord(helloID, "Bye"); err != nil {
+		t.Fatal("Replacement caused an error")
+	}
+
+	helloID, ok := dict.Id("Hello")
+	assert.True(t, ok, "Hello should have an ID")
+	byeID, ok := dict.Id("Bye")
+	assert.True(t, ok, "Bye should have an ID")
+	assert.Equal(t, helloID, byeID)
+
+	// do it a second time and you will get an errorr
+	if err := dict.ReplaceWord(helloID, "Bye"); err == nil {
+		t.Errorf("Expected an error when replacing a word with a known ID")
+	}
+
+	if err := dict.ReplaceWord(100, "bar"); err == nil {
+		t.Errorf("Expected an error when replacing an unknown word")
+	}
+
+}

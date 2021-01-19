@@ -178,6 +178,7 @@ func (c *Corpus) Replace(a, with string) error {
 		return errors.Errorf("Cannot replace %q with %q. %q exists in the corpus", a, with, with)
 	}
 	c.words[old] = with
+	c.ids[with] = old
 	return nil
 
 }
@@ -191,5 +192,6 @@ func (c *Corpus) ReplaceWord(id int, with string) error {
 		return errors.Errorf("Cannot replace word with ID %d with %q. %q exists in the corpus", id, with, with)
 	}
 	c.words[id] = with
+	c.ids[with] = id
 	return nil
 }

@@ -7,6 +7,8 @@ import (
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // sortutil is a utility struct meant to sort words based on IDs
@@ -143,4 +145,28 @@ func (c *Corpus) LoadOneGram(r io.Reader) error {
 		}
 	}
 	return nil
+}
+
+// FromTextCorpus is a utility function to take in a text file, and return a Corpus.
+func FromTextCorpus(r io.Reader, tokenizer func(a string) []string, normalizer func(a string) string) (*Corpus, error) {
+	if tokenizer == nil {
+		tokenizer = func(a string) []string {
+			return strings.Split(strings.Trim(a, "\r\n "), " ")
+		}
+	}
+	if normalizer == nil {
+		normalizer = func(a string) string { return a }
+	}
+
+	var words []string
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		line := scanner.Text()
+		words = append(words, tokenizer(normalizer(line))...)
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, errors.Wrap(err, "Unable to read from text corpus")
+	}
+
+	return Construct(WithWords(words))
 }

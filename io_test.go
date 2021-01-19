@@ -3,10 +3,13 @@ package corpus
 import (
 	"bytes"
 	"encoding/gob"
+	"os"
+	"regexp"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCorpusGob(t *testing.T) {
@@ -84,5 +87,37 @@ func TestLoadOneGram(t *testing.T) {
 		t.Errorf("Expected \"for\" to be in corpus after loading one gram file")
 	}
 	assert.Equal(int(c.maxid-1), id)
+}
 
+func TestFromTextCorpus(t *testing.T) {
+	f, err := os.Open("testdata/corpus_en.txt")
+	require.NoError(t, err)
+
+	// set up a dumb english tokenizer for a more "realistic" tokenization than just whitespace.
+	pattern := regexp.MustCompile(`'s|'t|'re|'ve|'m|'ll|'d| ?\pL+| ?\pN+| ?[^\s\pL\pN]+|\s+`)
+	dumbTokenizer := func(a string) []string {
+		strs := pattern.FindAllString(a, -1)
+		for i := range strs {
+			strs[i] = strings.Trim(strs[i], "\r\n ")
+		}
+		return strs
+	}
+	dumbNormalizer := func(a string) string { return strings.ToLower(a) }
+	c, err := FromTextCorpus(f, dumbTokenizer, dumbNormalizer)
+	require.NoError(t, err)
+
+	aliceID, ok := c.Id("alice")
+	assert.True(t, ok)
+	assert.Equal(t, 128, aliceID)
+
+	freq := c.IDFreq(aliceID)
+	assert.Equal(t, 399, freq)
+
+	// FOR DEBUG PURPOSES
+	// g, err := os.OpenFile("testdata/tmp", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+	// require.NoError(t, err)
+	// for i, w := range c.words {
+	// 	fmt.Fprintf(g, "%v %d\n", w, c.frequencies[i])
+	// }
+	// g.Close()
 }
