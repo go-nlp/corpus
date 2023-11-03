@@ -15,8 +15,8 @@ func TestCorpus(t *testing.T) {
 	id := dict.Add("hello")
 
 	assert.Equal(3, id)
-	assert.Equal([]string{"", "-UNKNOWN-", "-ROOT-", "hello"}, dict.words)
-	assert.Equal(map[string]int{"": 0, "-UNKNOWN-": 1, "-ROOT-": 2, "hello": 3}, dict.ids)
+	assert.Equal([]string{"", "-UNKNOWN-", "-ROOT-", "hello"}, dict.Words)
+	assert.Equal(map[string]int{"": 0, "-UNKNOWN-": 1, "-ROOT-": 2, "hello": 3}, dict.Ids)
 	assert.Equal(4, dict.Size())
 
 	id2, ok := dict.Id("hello")
@@ -50,16 +50,16 @@ func TestCorpus_Merge(t *testing.T) {
 
 	dict := New()
 	id := dict.Add("hello")
-	dict.frequencies[id] += 4 // freq for "hello" is 5
-	dict.totalFreq += 4
+	dict.Frequencies[id] += 4 // freq for "hello" is 5
+	dict.TotalWordFreq += 4
 
 	other := New()
 	id = other.Add("hello")
-	other.frequencies[id] += 2 // freq for "hello" is 3
-	other.totalFreq += 2
+	other.Frequencies[id] += 2 // freq for "hello" is 3
+	other.TotalWordFreq += 2
 	id = other.Add("world")
-	other.frequencies[id] += 1
-	other.totalFreq += 1
+	other.Frequencies[id] += 1
+	other.TotalWordFreq += 1
 
 	dict.Merge(other)
 

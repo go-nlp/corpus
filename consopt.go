@@ -12,21 +12,21 @@ import (
 // ConsOpt is a construction option for manual creation of a Corpus
 type ConsOpt func(c *Corpus) error
 
-// WithWords creates a corpus from a word list. It may have repeated words
+// WithWords creates a corpus from a word list. It may have repeated Words
 func WithWords(a []string) ConsOpt {
 	f := func(c *Corpus) error {
 		s := set.Strings(a)
-		c.words = s
-		c.frequencies = make([]int, len(s))
+		c.Words = s
+		c.Frequencies = make([]int, len(s))
 
 		ids := make(map[string]int)
 		maxID := len(s)
 
 		var totalFreq, maxWL int
-		// NOTE: here we're iterating over the set of words
+		// NOTE: here we're iterating over the set of Words
 		for i, w := range s {
 			runeCount := utf8.RuneCountInString(w)
-			if runeCount > c.maxWordLength {
+			if runeCount > c.MaxWordLength_ {
 				maxWL = runeCount
 			}
 
@@ -35,14 +35,14 @@ func WithWords(a []string) ConsOpt {
 
 		// NOTE: here we're iterating over the original word list.
 		for _, w := range a {
-			c.frequencies[ids[w]]++
+			c.Frequencies[ids[w]]++
 			totalFreq++
 		}
 
-		c.ids = ids
-		atomic.AddInt64(&c.maxid, int64(maxID))
-		c.totalFreq = totalFreq
-		c.maxWordLength = maxWL
+		c.Ids = ids
+		atomic.AddInt64(&c.MaxID, int64(maxID))
+		c.TotalWordFreq = totalFreq
+		c.MaxWordLength_ = maxWL
 		return nil
 	}
 	return f
@@ -52,10 +52,10 @@ func WithWords(a []string) ConsOpt {
 func WithOrderedWords(a []string) ConsOpt {
 	f := func(c *Corpus) error {
 		s := a
-		c.words = s
-		c.frequencies = make([]int, len(s))
-		for i := range c.frequencies {
-			c.frequencies[i] = 1
+		c.Words = s
+		c.Frequencies = make([]int, len(s))
+		for i := range c.Frequencies {
+			c.Frequencies[i] = 1
 		}
 
 		ids := make(map[string]int)
@@ -64,16 +64,16 @@ func WithOrderedWords(a []string) ConsOpt {
 		var maxWL int
 		for i, w := range a {
 			runeCount := utf8.RuneCountInString(w)
-			if runeCount > c.maxWordLength {
+			if runeCount > c.MaxWordLength_ {
 				maxWL = runeCount
 			}
 			ids[w] = i
 		}
 
-		c.ids = ids
-		atomic.AddInt64(&c.maxid, int64(maxID))
-		c.totalFreq = totalFreq
-		c.maxWordLength = maxWL
+		c.Ids = ids
+		atomic.AddInt64(&c.MaxID, int64(maxID))
+		c.TotalWordFreq = totalFreq
+		c.MaxWordLength_ = maxWL
 		return nil
 	}
 	return f
@@ -82,8 +82,8 @@ func WithOrderedWords(a []string) ConsOpt {
 // WithSize preallocates all the things in Corpus
 func WithSize(size int) ConsOpt {
 	return func(c *Corpus) error {
-		c.words = make([]string, 0, size)
-		c.frequencies = make([]int, 0, size)
+		c.Words = make([]string, 0, size)
+		c.Frequencies = make([]int, 0, size)
 		return nil
 	}
 }
@@ -98,22 +98,22 @@ func FromDict(d map[string]int) ConsOpt {
 			a.ids = append(a.ids, v)
 		}
 		sort.Sort(&a)
-		c.ids = make(map[string]int)
+		c.Ids = make(map[string]int)
 		for i, w := range a.words {
 			if i != a.ids[i] {
 				return errors.Errorf("Unmarshaling error. Expected %dth ID to be %d. Got %d instead. Perhaps something went wrong during sorting? SLYTHERIN IT IS!", i, i, a.ids[i])
 			}
-			c.words = append(c.words, w)
-			c.frequencies = append(c.frequencies, 1)
-			c.ids[w] = i
+			c.Words = append(c.Words, w)
+			c.Frequencies = append(c.Frequencies, 1)
+			c.Ids[w] = i
 
-			c.totalFreq++
+			c.TotalWordFreq++
 			runeCount := utf8.RuneCountInString(w)
-			if runeCount > c.maxWordLength {
-				c.maxWordLength = runeCount
+			if runeCount > c.MaxWordLength_ {
+				c.MaxWordLength_ = runeCount
 			}
 		}
-		c.maxid = int64(len(a.words))
+		c.MaxID = int64(len(a.words))
 		return nil
 	}
 
@@ -129,22 +129,22 @@ func FromDictWithFreq(d map[string]struct{ ID, Freq int }) ConsOpt {
 			a.freqs = append(a.freqs, v.Freq)
 		}
 		sort.Sort(&a)
-		c.ids = make(map[string]int)
+		c.Ids = make(map[string]int)
 		for i, w := range a.words {
 			if i != a.ids[i] {
 				return errors.Errorf("Unmarshaling error. Expected %dth ID to be %d. Got %d instead. Perhaps something went wrong during sorting? SLYTHERIN IT IS!", i, i, a.ids[i])
 			}
-			c.words = append(c.words, w)
-			c.frequencies = append(c.frequencies, a.freqs[i])
-			c.ids[w] = i
+			c.Words = append(c.Words, w)
+			c.Frequencies = append(c.Frequencies, a.freqs[i])
+			c.Ids[w] = i
 
-			c.totalFreq += a.freqs[i]
+			c.TotalWordFreq += a.freqs[i]
 			runeCount := utf8.RuneCountInString(w)
-			if runeCount > c.maxWordLength {
-				c.maxWordLength = runeCount
+			if runeCount > c.MaxWordLength_ {
+				c.MaxWordLength_ = runeCount
 			}
 		}
-		c.maxid = int64(len(a.words))
+		c.MaxID = int64(len(a.words))
 		return nil
 	}
 }
