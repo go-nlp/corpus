@@ -6,7 +6,7 @@ import (
 	"unicode/utf8"
 )
 
-// ViterbiSplit is a Viterbi algorithm for splitting words given a corpus
+// ViterbiSplit is a Viterbi algorithm for splitting Words given a corpus
 func ViterbiSplit(input string, c *Corpus) []string {
 	s := strings.ToLower(input)
 	probabilities := []float64{1.0}
@@ -22,7 +22,7 @@ func ViterbiSplit(input string, c *Corpus) []string {
 		probs := make([]float64, 0)
 		ls := make([]int, 0)
 
-		// m := maxInt(0, i-c.maxWordLength)
+		// m := maxInt(0, i-c.MaxWordLength_)
 
 		for j, r := range runes {
 			if r > i {
@@ -32,7 +32,7 @@ func ViterbiSplit(input string, c *Corpus) []string {
 			p, ok := c.WordProb(s[r : i+1])
 			if !ok {
 				// http://stackoverflow.com/questions/195010/how-can-i-split-multiple-joined-words#comment48879458_481773
-				p = (math.Log(float64(1)/float64(c.totalFreq)) - float64(c.maxWordLength) - float64(1)) * float64(i-r) // note it should be i-r not j-i as per the SO post
+				p = (math.Log(float64(1)/float64(c.TotalWordFreq)) - float64(c.MaxWordLength_) - float64(1)) * float64(i-r) // note it should be i-r not j-i as per the SO post
 			}
 			prob := probabilities[j] * p
 

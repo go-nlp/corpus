@@ -28,11 +28,11 @@ func (s *sortutil) Swap(i, j int) {
 	}
 }
 
-// ToDictWithFreq returns a simple marshalable type. Conceptually it's a JSON object with the words as the keys. The values are a pair - ID and Freq.
+// ToDictWithFreq returns a simple marshalable type. Conceptually it's a JSON object with the Words as the keys. The values are a pair - ID and Freq.
 func ToDictWithFreq(c *Corpus) map[string]struct{ ID, Freq int } {
 	retVal := make(map[string]struct{ ID, Freq int })
-	for i, w := range c.words {
-		retVal[w] = struct{ ID, Freq int }{i, c.frequencies[i]}
+	for i, w := range c.Words {
+		retVal[w] = struct{ ID, Freq int }{i, c.Frequencies[i]}
 	}
 	return retVal
 }
@@ -40,7 +40,7 @@ func ToDictWithFreq(c *Corpus) map[string]struct{ ID, Freq int } {
 // ToDict returns a marshalable dict. It returns a copy of the ID mapping.
 func ToDict(c *Corpus) map[string]int {
 	retVal := make(map[string]int)
-	for k, v := range c.ids {
+	for k, v := range c.Ids {
 		retVal[k] = v
 	}
 	return retVal
@@ -51,27 +51,27 @@ func (c *Corpus) GobEncode() ([]byte, error) {
 	var buf bytes.Buffer
 	encoder := gob.NewEncoder(&buf)
 
-	if err := encoder.Encode(c.words); err != nil {
+	if err := encoder.Encode(c.Words); err != nil {
 		return nil, err
 	}
 
-	if err := encoder.Encode(c.ids); err != nil {
+	if err := encoder.Encode(c.Ids); err != nil {
 		return nil, err
 	}
 
-	if err := encoder.Encode(c.frequencies); err != nil {
+	if err := encoder.Encode(c.Frequencies); err != nil {
 		return nil, err
 	}
 
-	if err := encoder.Encode(c.maxid); err != nil {
+	if err := encoder.Encode(c.MaxID); err != nil {
 		return nil, err
 	}
 
-	if err := encoder.Encode(c.totalFreq); err != nil {
+	if err := encoder.Encode(c.TotalWordFreq); err != nil {
 		return nil, err
 	}
 
-	if err := encoder.Encode(c.maxWordLength); err != nil {
+	if err := encoder.Encode(c.MaxWordLength_); err != nil {
 		return nil, err
 	}
 
@@ -83,34 +83,34 @@ func (c *Corpus) GobDecode(buf []byte) error {
 	b := bytes.NewBuffer(buf)
 	decoder := gob.NewDecoder(b)
 
-	if err := decoder.Decode(&c.words); err != nil {
+	if err := decoder.Decode(&c.Words); err != nil {
 		return err
 	}
 
-	if err := decoder.Decode(&c.ids); err != nil {
+	if err := decoder.Decode(&c.Ids); err != nil {
 		return err
 	}
 
-	if err := decoder.Decode(&c.frequencies); err != nil {
+	if err := decoder.Decode(&c.Frequencies); err != nil {
 		return err
 	}
 
-	if err := decoder.Decode(&c.maxid); err != nil {
+	if err := decoder.Decode(&c.MaxID); err != nil {
 		return err
 	}
 
-	if err := decoder.Decode(&c.totalFreq); err != nil {
+	if err := decoder.Decode(&c.TotalWordFreq); err != nil {
 		return err
 	}
 
-	if err := decoder.Decode(&c.maxWordLength); err != nil {
+	if err := decoder.Decode(&c.MaxWordLength_); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// LoadOneGram loads a 1_gram.txt file, which is a tab separated file which lists the frequency counts of words. Example:
+// LoadOneGram loads a 1_gram.txt file, which is a tab separated file which lists the frequency counts of Words. Example:
 // 		the	23135851162
 // 		of	13151942776
 // 		and	12997637966
@@ -135,13 +135,13 @@ func (c *Corpus) LoadOneGram(r io.Reader) error {
 		}
 
 		id := c.Add(word)
-		c.frequencies[id] = count
-		c.totalFreq--
-		c.totalFreq += count
+		c.Frequencies[id] = count
+		c.TotalWordFreq--
+		c.TotalWordFreq += count
 
 		wc := len([]rune(word))
-		if wc > c.maxWordLength {
-			c.maxWordLength = wc
+		if wc > c.MaxWordLength_ {
+			c.MaxWordLength_ = wc
 		}
 	}
 	return nil

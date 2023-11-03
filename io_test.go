@@ -52,12 +52,12 @@ func TestCorpusToDict(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(c.words, c2.words, "Expected words to be the same")
-	assert.Equal(c.ids, c2.ids, "Expected IDs to be the same")
-	assert.NotEqual(c.frequencies, c2.frequencies, "Expected frequencies to not be the same")
-	assert.Equal(c.maxid, c2.maxid, "Expected maxID to be the same")
-	assert.NotEqual(c.totalFreq, c2.totalFreq, "Expected totalFreq to be different.")
-	assert.Equal(c.maxWordLength, c2.maxWordLength, "Expected maxWordLength to be the same")
+	assert.Equal(c.Words, c2.Words, "Expected Words to be the same")
+	assert.Equal(c.Ids, c2.Ids, "Expected IDs to be the same")
+	assert.NotEqual(c.Frequencies, c2.Frequencies, "Expected Frequencies to not be the same")
+	assert.Equal(c.MaxID, c2.MaxID, "Expected maxID to be the same")
+	assert.NotEqual(c.TotalWordFreq, c2.TotalWordFreq, "Expected TotalWordFreq to be different.")
+	assert.Equal(c.MaxWordLength_, c2.MaxWordLength_, "Expected MaxWordLength_ to be the same")
 }
 
 func TestCorpusToDictWithFreq(t *testing.T) {
@@ -86,7 +86,7 @@ func TestLoadOneGram(t *testing.T) {
 	if !ok {
 		t.Errorf("Expected \"for\" to be in corpus after loading one gram file")
 	}
-	assert.Equal(int(c.maxid-1), id)
+	assert.Equal(int(c.MaxID-1), id)
 }
 
 func TestFromTextCorpus(t *testing.T) {
@@ -116,8 +116,8 @@ func TestFromTextCorpus(t *testing.T) {
 	// FOR DEBUG PURPOSES
 	// g, err := os.OpenFile("testdata/tmp", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
 	// require.NoError(t, err)
-	// for i, w := range c.words {
-	// 	fmt.Fprintf(g, "%v %d\n", w, c.frequencies[i])
+	// for i, w := range c.Words {
+	// 	fmt.Fprintf(g, "%v %d\n", w, c.Frequencies[i])
 	// }
 	// g.Close()
 }

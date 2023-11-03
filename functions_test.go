@@ -24,8 +24,8 @@ func TestViterbiSplit(t *testing.T) {
 	/*
 		   // FAILING TEST
 			s2 = "curiouserandcuriouser"
-			words = ViterbiSplit(s2, dict)
-			assert.Equal([]string{"curiouser", "and", "curiouser"}, words)
+			Words = ViterbiSplit(s2, dict)
+			assert.Equal([]string{"curiouser", "and", "curiouser"}, Words)
 	*/
 
 	s3 := "thebestwaytoexplainitistodoit"
